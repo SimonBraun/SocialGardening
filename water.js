@@ -1,5 +1,8 @@
-/* 
-SocialGardening
+/*jslint node:true, vars:true, bitwise:true, unparam:true */
+/*jshint unused:true */
+
+/*
+A simple node.js application intended to blink the onboard LED on the Intel based development boards such as the Intel(R) Galileo and Edison with Arduino breakout board.
 
 MRAA - Low Level Skeleton Library for Communication on GNU/Linux platforms
 Library in C/C++ to interface with Galileo & other Intel platforms, in a structured and sane API with port nanmes/numbering that match boards & with bindings to javascript & python.
@@ -16,12 +19,10 @@ client.on('connect', function(){
     //client.emit("sensor:waterlevel", {"test": "test"});
 });
 
-
-// Test LED blink
+//var myOnboardLed = new mraa.Gpio(3, false, true); //LED hooked up to digital pin (or built in pin on Galileo Gen1)
 var myOnboardLed = new mraa.Gpio(13); //LED hooked up to digital pin 13 (or built in pin on Intel Galileo Gen2 as well as Intel Edison)
 myOnboardLed.dir(mraa.DIR_OUT); //set the gpio direction to output
 var ledState = true; //Boolean to hold the state of Led
-
 
 // inititialize sensors
 var soilSensorD = new mraa.Gpio(7);
@@ -43,14 +44,14 @@ periodicActivity(); //call the periodicActivity function
 function periodicActivity()
 {
     //relayD.write(1);
-    myOnboardLed.write(ledState?1:0);
-    ledState = !ledState;
+    myOnboardLed.write(ledState?1:0); //if ledState is true then write a '1' (high) otherwise write a '0' (low)
+    ledState = !ledState; //invert the ledState
     
     readSensorValues();
     printSerial();
     checkToWater();
     
-    setTimeout(periodicActivity,500);
+    setTimeout(periodicActivity,1000); //milliseconds
 }
 
 function checkToWater()
@@ -82,10 +83,11 @@ function readWaterLevel()
 
 function clientEmit()
 {
-    waterLevelNormalized = 0.15 * waterLevel;
-    soilLevelNormalized = 1 * soilLevel;
+    waterLevelNormalized = Math.round(0.15 * waterLevel);
+    soilLevelNormalized = Math.round(1 * soilLevel);
     client.emit('sensor:waterlevel', {value: waterLevelNormalized});
     client.emit('sensor:moisture', {value: soilLevelNormalized});
+    console.log('round water = ' + waterLevelNormalized);
 }
 
 function printSerial()
