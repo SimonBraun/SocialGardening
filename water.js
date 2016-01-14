@@ -50,7 +50,7 @@ function periodicActivity()
     printSerial();
     checkToWater();
     
-    setTimeout(periodicActivity,3000);
+    setTimeout(periodicActivity,500);
 }
 
 function checkToWater()
