@@ -1,8 +1,4 @@
-/*jslint node:true, vars:true, bitwise:true, unparam:true */
-/*jshint unused:true */
-
-/*
-A simple node.js application intended to blink the onboard LED on the Intel based development boards such as the Intel(R) Galileo and Edison with Arduino breakout board.
+/* SocialGardening
 
 MRAA - Low Level Skeleton Library for Communication on GNU/Linux platforms
 Library in C/C++ to interface with Galileo & other Intel platforms, in a structured and sane API with port nanmes/numbering that match boards & with bindings to javascript & python.
@@ -10,7 +6,14 @@ Library in C/C++ to interface with Galileo & other Intel platforms, in a structu
 
 var mraa = require('mraa'); //require mraa
 console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the Intel XDK console
-console.log('Hallöchen, lest start our project :) ');
+
+var clientio = require('socket.io-client')('http://192.168.2.2:3000');
+var client    = clientio.connect('http://192.168.2.2:3000'); 
+
+client.on('connect', function(){
+    console.log('connected to backend');
+    //client.emit("sensor:waterlevel", {"test": "test"});
+});
 
 //var myOnboardLed = new mraa.Gpio(3, false, true); //LED hooked up to digital pin (or built in pin on Galileo Gen1)
 var myOnboardLed = new mraa.Gpio(13); //LED hooked up to digital pin 13 (or built in pin on Intel Galileo Gen2 as well as Intel Edison)
@@ -22,8 +25,10 @@ var soilSensorD = new mraa.Gpio(7);
 soilSensorD.dir(mraa.DIR_IN);
 var waterSensorA = new mraa.Aio(0);
 var waterLevel = waterSensorA.read();
+var waterLevelNormalized = 0;
 var soilSensorA = new mraa.Aio(1);
 var soilLevel = soilSensorA.read();
+var soilLevelNormalized = 0;
 
 //initialize actors
 var relayD = new mraa.Gpio(8);
@@ -59,6 +64,7 @@ function readSensorValues()
 {
     readSoilMoisture();
     readWaterLevel();
+    clientEmit()
 }
 
 function readSoilMoisture()
@@ -69,6 +75,14 @@ function readSoilMoisture()
 function readWaterLevel()
 {
     waterLevel = waterSensorA.read();
+}
+
+function clientEmit()
+{
+    waterLevelNormalized = 0.15 * waterLevel;
+    soilLevelNormalized = 1 * soilLevel;
+    client.emit('sensor:waterlevel', {value: waterLevelNormalized});
+    client.emit('sensor:moisture', {value: soilLevelNormalized});
 }
 
 function printSerial()
