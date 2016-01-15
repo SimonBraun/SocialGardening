@@ -29,14 +29,12 @@ client.on('connect', function(){
 
 });
 
-
-
-//var myOnboardLed = new mraa.Gpio(3, false, true); //LED hooked up to digital pin (or built in pin on Galileo Gen1)
+// initialize OnBoard LED
 var myOnboardLed = new mraa.Gpio(13); //LED hooked up to digital pin 13 (or built in pin on Intel Galileo Gen2 as well as Intel Edison)
 myOnboardLed.dir(mraa.DIR_OUT); //set the gpio direction to output
 var ledState = true; //Boolean to hold the state of Led
 
-// inititialize sensors
+// initialize sensors
 var soilSensorD = new mraa.Gpio(7);
 soilSensorD.dir(mraa.DIR_IN);
 var waterSensorA = new mraa.Aio(0);
@@ -68,7 +66,7 @@ function checkToWater()
     //waterLevel    leer    0 -> 100 voll
     if (moisture < configMoisture && waterLevel > 10) {
         relayD.write(0);
-        console.log('start watering -> ON');
+        console.log('               start watering -> ON');
     } else {
         relayD.write(1);
     }
