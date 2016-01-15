@@ -4,27 +4,7 @@ var mraa = require('mraa'); //require mraa
 console.log('MRAA Version: ' + mraa.getVersion());
 var BACKEND_URL = 'http://192.168.2.4:3000';
 
-var clientio = require('socket.io-client')(BACKEND_URL);
-var client    = clientio.connect(BACKEND_URL);
 
-var configMoisture = 69;
-var configuration = {
-    moisture: 50
-};
-
-client.on('connect', function(){
-
-    console.log('                connected to backend');
-
-    client.on('backend:configuration', function(data) {
-        console.log('               ' + data.moisture);
-        configuration.moisture = data.moisture;
-        configMoisture = data.moisture;
-        myOnboardLed.write(ledState?1:0);
-        ledState = !ledState; //invert the ledState
-    });
-
-});
 
 // initialize OnBoard LED
 var myOnboardLed = new mraa.Gpio(13); //LED hooked up to digital pin 13 (or built in pin on Intel Galileo Gen2)
@@ -41,7 +21,16 @@ var moisture = soilSensorA.read();
 var relayD = new mraa.Gpio(8);
 relayD.dir(mraa.DIR_OUT);
 
+// initialize vars for socket-io
+var clientio = require('socket.io-client')(BACKEND_URL);
+var client    = clientio.connect(BACKEND_URL);
 
+var configMoisture = 69;
+var configuration = {
+    moisture: 50
+};
+
+setUpSocket();
 periodicActivity(); //call the periodicActivity function
 
 function periodicActivity()
@@ -52,6 +41,24 @@ function periodicActivity()
 
     setTimeout(periodicActivity,500); //milliseconds
 }
+
+
+function setUpSocket()
+{
+    client.on('connect', function(){
+
+        console.log('                connected to backend');
+
+        client.on('backend:configuration', function(data) {
+            console.log('               ' + data.moisture);
+            configuration.moisture = data.moisture;
+            configMoisture = data.moisture;
+            myOnboardLed.write(ledState?1:0);
+            ledState = !ledState; //invert the ledState
+        });
+    });
+}
+
 
 function checkToWater()
 {
