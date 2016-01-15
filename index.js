@@ -16,6 +16,7 @@ var waterSensorA = new mraa.Aio(0);
 var waterLevel = waterSensorA.read();
 var soilSensorA = new mraa.Aio(1);
 var moisture = soilSensorA.read();
+var readyToWater = true;
 
 //initialize actors
 var relayD = new mraa.Gpio(8);
@@ -64,12 +65,23 @@ function checkToWater()
 {
     //moisture      trocken 0 -> 100 nass
     //waterLevel    leer    0 -> 100 voll
-    if (moisture < configMoisture && waterLevel > 10) {
+    if (moisture < configMoisture && waterLevel > 10 && readyToWater == true) {
+        readyToWater = false;
+        setTimeout(function () {
+            readyToWater = true;
+            console.log('                              TIMEOUT -> set watering flag true');
+        }, 10000); //ms
+
         relayD.write(0);
-        console.log('               start watering -> ON');
-    } else {
-        relayD.write(1);
-    }
+        console.log('                              start watering -> relay ON');
+        setTimeout(function () {
+            relayD.write(1);
+            console.log('                              TIMEOUT -> stop watering -> relay OFF');
+        }, 3000);
+        
+    }/* else {
+        console.log('conditions failed to water');
+    }*/
 }
 
 function readSensorValues()
