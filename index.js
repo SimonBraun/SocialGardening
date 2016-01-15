@@ -3,8 +3,10 @@
 var mraa = require('mraa'); //require mraa
 console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the Intel XDK console
 
-var clientio = require('socket.io-client')('http://192.168.2.2:3000');
-var client    = clientio.connect('http://192.168.2.2:3000');
+const BACKEND_URL = 'http://192.168.2.2:3000';
+
+var clientio = require('socket.io-client')(BACKEND_URL);
+var client    = clientio.connect(BACKEND_URL);
 
 client.on('connect', function(){
     console.log('connected to backend');
