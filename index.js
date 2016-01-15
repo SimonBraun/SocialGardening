@@ -20,7 +20,8 @@ client.on('connect', function(){
     client.on('backend:configuration', function(data) {
         console.log('               ' + data.moisture);
         configuration.moisture = data.moisture;
-        configMoisture = ((100 - data.moisture) * 4) + 300;
+        configMoisture = data.moisture;
+        // !!old!!  configMoisture = ((100 - data.moisture) * 4) + 300;
         //moisture - Feuchtigkeitswert 0-100
         myOnboardLed.write(ledState?1:0);
         ledState = !ledState; //invert the ledState
@@ -63,9 +64,11 @@ function periodicActivity()
 
 function checkToWater()
 {
-    if (moisture > configMoisture && waterLevel > 220) {
+    //moisture      trocken 0 -> 100 nass
+    //waterLevel    leer    0 -> 100 voll
+    if (moisture < configMoisture && waterLevel > 10) {
         relayD.write(0);
-        console.log('moisture > 600 && waterLevel < 1000  -> ON');
+        console.log('start watering -> ON');
     } else {
         relayD.write(1);
     }
@@ -73,27 +76,19 @@ function checkToWater()
 
 function readSensorValues()
 {
-    readSoilMoisture();
-    readWaterLevel();
+    moisture = 100 - Math.round((soilSensorA.read() - 250) / 4.5);
+    waterLevel = Math.round(waterSensorA.read() / 7);
     clientEmit();
-}
-
-function readSoilMoisture()
-{
-    moisture = soilSensorA.read();
-}
-
-function readWaterLevel()
-{
-    waterLevel = waterSensorA.read();
 }
 
 function clientEmit()
 {
-    waterLevelNormalized = Math.round(0.15 * waterLevel);
-    moistureNormalized = Math.round(1 * moisture);
-    client.emit('sensor:waterlevel', {value: waterLevelNormalized});
-    client.emit('sensor:moisture', {value: moistureNormalized});
+    //waterLevelNormalized = Math.round(0.15 * waterLevel);
+    //moistureNormalized = Math.round(1 * moisture);
+    //client.emit('sensor:waterlevel', {value: waterLevelNormalized});
+    //client.emit('sensor:moisture', {value: moistureNormalized});
+    client.emit('sensor:waterlevel', {value: waterLevel});
+    client.emit('sensor:moisture', {value: moisture});
 }
 
 function printSerial()
