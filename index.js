@@ -8,8 +8,16 @@ const BACKEND_URL = 'http://192.168.2.2:3000';
 var clientio = require('socket.io-client')(BACKEND_URL);
 var client    = clientio.connect(BACKEND_URL);
 
+
+var
+
 client.on('connect', function(){
+
     console.log('connected to backend');
+
+    client.on('backend:configuration', function(data) {
+
+    });
 });
 
 //var myOnboardLed = new mraa.Gpio(3, false, true); //LED hooked up to digital pin (or built in pin on Galileo Gen1)
@@ -24,8 +32,8 @@ var waterSensorA = new mraa.Aio(0);
 var waterLevel = waterSensorA.read();
 var waterLevelNormalized = 0;
 var soilSensorA = new mraa.Aio(1);
-var soilLevel = soilSensorA.read();
-var soilLevelNormalized = 0;
+var moisture = soilSensorA.read();
+var moistureNormalized = 0;
 
 //initialize actors
 var relayD = new mraa.Gpio(8);
@@ -49,9 +57,9 @@ function periodicActivity()
 
 function checkToWater()
 {
-    if (soilLevel > 600 && waterLevel > 220) {
+    if (moisture > 600 && waterLevel > 220) {
         relayD.write(0);
-        console.log('soilLevel > 600 && waterLevel < 1000  -> ON');
+        console.log('moisture > 600 && waterLevel < 1000  -> ON');
     } else {
         relayD.write(1);
     }
@@ -66,7 +74,7 @@ function readSensorValues()
 
 function readSoilMoisture()
 {
-    soilLevel = soilSensorA.read();
+    moisture = soilSensorA.read();
 }
 
 function readWaterLevel()
@@ -77,14 +85,14 @@ function readWaterLevel()
 function clientEmit()
 {
     waterLevelNormalized = Math.round(0.15 * waterLevel);
-    soilLevelNormalized = Math.round(1 * soilLevel);
+    moistureNormalized = Math.round(1 * moisture);
     client.emit('sensor:waterlevel', {value: waterLevelNormalized});
-    client.emit('sensor:moisture', {value: soilLevelNormalized});
+    client.emit('sensor:moisture', {value: moistureNormalized});
     console.log('round water = ' + waterLevelNormalized);
 }
 
 function printSerial()
 {
-    console.log('soil level = ' + soilLevel);
+    console.log('moisture = ' + moisture);
     console.log('water level = ' + waterLevel);
 }
