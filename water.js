@@ -1,22 +1,13 @@
-/*jslint node:true, vars:true, bitwise:true, unparam:true */
-/*jshint unused:true */
 
-/*
-A simple node.js application intended to blink the onboard LED on the Intel based development boards such as the Intel(R) Galileo and Edison with Arduino breakout board.
-
-MRAA - Low Level Skeleton Library for Communication on GNU/Linux platforms
-Library in C/C++ to interface with Galileo & other Intel platforms, in a structured and sane API with port nanmes/numbering that match boards & with bindings to javascript & python.
-*/
 
 var mraa = require('mraa'); //require mraa
 console.log('MRAA Version: ' + mraa.getVersion()); //write the mraa version to the Intel XDK console
 
 var clientio = require('socket.io-client')('http://192.168.2.2:3000');
-var client    = clientio.connect('http://192.168.2.2:3000'); 
+var client    = clientio.connect('http://192.168.2.2:3000');
 
 client.on('connect', function(){
     console.log('connected to backend');
-    //client.emit("sensor:waterlevel", {"test": "test"});
 });
 
 //var myOnboardLed = new mraa.Gpio(3, false, true); //LED hooked up to digital pin (or built in pin on Galileo Gen1)
@@ -46,11 +37,11 @@ function periodicActivity()
     //relayD.write(1);
     myOnboardLed.write(ledState?1:0); //if ledState is true then write a '1' (high) otherwise write a '0' (low)
     ledState = !ledState; //invert the ledState
-    
+
     readSensorValues();
     printSerial();
     checkToWater();
-    
+
     setTimeout(periodicActivity,1000); //milliseconds
 }
 
