@@ -1,6 +1,7 @@
 
 var colors = require('colors');
 
+
 var mraa = require('mraa'); //require mraa
 console.log('---------------------------'.inverse);
 console.log('WELCOME TO SOCIAL GARDENING'.inverse);
@@ -8,6 +9,8 @@ console.log('---------------------------'.inverse);
 
 console.log('MRAA Version: ' + mraa.getVersion());
 var BACKEND_URL = 'http://192.168.2.4:3000';
+
+
 
 // initialize OnBoard LED
 var myOnboardLed = new mraa.Gpio(13); //LED hooked up to digital pin 13 (or built in pin on Intel Galileo Gen2)
@@ -73,7 +76,7 @@ function checkToWater()
         setTimeout(function () {
             readyToWater = true;
             console.log('TIMEOUT -> set watering flag true'.yellow);
-        }, 10000); //ms
+        }, 120000); //ms
 
         relayD.write(0);
         console.log('start watering -> relay ON'.yellow);
