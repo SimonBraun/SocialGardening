@@ -76,7 +76,7 @@ function checkToWater()
         setTimeout(function () {
             readyToWater = true;
             console.log('TIMEOUT -> set watering flag true'.yellow);
-        }, 10000); //ms
+        }, 120000); //ms
 
         relayD.write(0);
         console.log('start watering -> relay ON'.yellow);
