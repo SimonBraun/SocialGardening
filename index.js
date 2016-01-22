@@ -38,6 +38,7 @@ var configuration = {
 };
 
 setUpSocket();
+//setTimeout(periodicActivity(), 1000);
 periodicActivity(); //call the periodicActivity function
 
 function periodicActivity()
@@ -93,9 +94,13 @@ function readSensorValues()
     moisture = 100 - Math.round((soilSensorA.read() - 250) / 4.5);
     if (moisture > 100) 
         moisture = 100;
+    if (moisture < 0)
+        moisture = 0;
     waterLevel = Math.round(waterSensorA.read() / 7);
     if (waterLevel > 100)
         waterLevel = 100;
+    if (waterLevel < 0)
+        waterLevel = 0;
     clientEmit();
 }
 
