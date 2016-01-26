@@ -27,6 +27,7 @@ var readyToWater = true;
 //initialize actors
 var relayD = new mraa.Gpio(8);
 relayD.dir(mraa.DIR_OUT);
+relayD.write(1);
 
 // initialize vars for socket-io
 var clientio = require('socket.io-client')(BACKEND_URL);
