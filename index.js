@@ -8,7 +8,7 @@ console.log('WELCOME TO SOCIAL GARDENING'.inverse);
 console.log('---------------------------'.inverse);
 
 console.log('MRAA Version: ' + mraa.getVersion());
-var BACKEND_URL = 'http://192.168.2.4:3000';
+var BACKEND_URL = 'http://192.168.2.3:3000';
 
 
 
@@ -30,7 +30,7 @@ relayD.dir(mraa.DIR_OUT);
 
 // initialize vars for socket-io
 var clientio = require('socket.io-client')(BACKEND_URL);
-var client    = clientio.connect(BACKEND_URL);
+var client   = clientio.connect(BACKEND_URL);
 
 var configMoisture = 69;
 var configuration = {
@@ -38,7 +38,6 @@ var configuration = {
 };
 
 setUpSocket();
-//setTimeout(periodicActivity(), 1000);
 periodicActivity(); //call the periodicActivity function
 
 function periodicActivity()
@@ -56,7 +55,7 @@ function setUpSocket()
     client.on('connect', function(){
 
         console.log('connected to backend'.green);
-
+        client.emit('device:online', {name: 'Galileo'});
         client.on('backend:configuration', function(data) {
             console.log(data.moisture);
             configuration.moisture = data.moisture;
@@ -85,22 +84,18 @@ function checkToWater()
             relayD.write(1);
             console.log('TIMEOUT -> stop watering -> relay OFF'.yellow);
         }, 3000);
-        
+
     }
 }
 
 function readSensorValues()
 {
     moisture = 100 - Math.round((soilSensorA.read() - 250) / 4.5);
-    if (moisture > 100) 
+    if (moisture > 100)
         moisture = 100;
-    if (moisture < 0)
-        moisture = 0;
     waterLevel = Math.round(waterSensorA.read() / 7);
     if (waterLevel > 100)
         waterLevel = 100;
-    if (waterLevel < 0)
-        waterLevel = 0;
     clientEmit();
 }
 
