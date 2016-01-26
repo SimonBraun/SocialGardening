@@ -76,14 +76,14 @@ function checkToWater()
         setTimeout(function () {
             readyToWater = true;
             console.log('TIMEOUT -> set watering flag true'.yellow);
-        }, 120000); //ms
+        }, 600000); //ms
 
         relayD.write(0);
         console.log('start watering -> relay ON'.yellow);
         setTimeout(function () {
             relayD.write(1);
             console.log('TIMEOUT -> stop watering -> relay OFF'.yellow);
-        }, 3000);
+        }, 5000);
 
     }
 }
